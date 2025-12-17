@@ -38,54 +38,79 @@ terminals.
 
 ------------------------------------------------------------------------
 
-🚀 Installation
+## 🚀 Installation
 
 This setup automatically enables the OneDark Bash prompt for every new Bash session.
 
-1. Place the OneDark configuration script
+### 1. Place the OneDark configuration script
 
 Create a directory for the theme and copy the configuration file:
 
+```bash
 mkdir -p ~/onedark
 cp onedark.sh ~/onedark/onedark.sh
+```
 
+> **Note**  
+> `onedark.sh` is a Bash configuration script and must be **sourced**, not executed.  
+> Do **not** mark it as executable (`chmod +x` is not required).
 
-Note: onedark.sh is a Bash configuration script and must be sourced, not executed.
-Do not mark it as executable.
+---
 
-2. Ensure .bashrc is loaded (Git Bash users only)
+### 2. Ensure `.bashrc` is loaded (Git Bash users only)
 
 On Ubuntu, this step is not required.
 
-For Git Bash on Windows, ensure ~/.bash_profile loads .bashrc:
+For Git Bash on Windows, ensure `~/.bash_profile` loads `.bashrc`:
 
+```bash
 if [ -f ~/.bashrc ]; then
   source ~/.bashrc
 fi
+```
 
-3. Enable automatic loading of the OneDark prompt
+---
 
-Add the following to the end of your ~/.bashrc:
+### 3. Enable automatic loading of the OneDark prompt
 
+Add the following to the **end** of your `~/.bashrc`:
+
+```bash
 # OneDark prompt
 if [ -f "$HOME/onedark/onedark.sh" ]; then
   source "$HOME/onedark/onedark.sh"
 fi
+```
 
-4. Reload the shell
+---
+
+### 4. Reload the shell
 
 Apply the changes without restarting the terminal:
 
+```bash
 source ~/.bashrc
-
+```
 
 Or simply open a new terminal window.
 
-5. (Optional) Manual activation
+---
+
+### 5. (Optional) Manual activation
 
 You can enable the theme manually in the current shell at any time:
 
+```bash
 source ~/onedark/onedark.sh
+```
+
+---
+
+## ℹ️ Notes
+
+- Do not run `onedark.sh` as a program (`./onedark.sh`)
+- Do not add execute permissions (`chmod +x`)
+- Prompt configuration must be sourced to affect the current shell
 
 ------------------------------------------------------------------------
 
