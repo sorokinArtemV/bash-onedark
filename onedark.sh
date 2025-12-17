@@ -15,11 +15,16 @@ __od_set_truecolor() {
   RED='\[\e[38;2;224;108;117m\]'    # #E06C75
 
   # Git adornment (safe if git not present)
-  git_prompt() {
-    local b; b="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" || return
-    local dirty=""; git diff --quiet --ignore-submodules 2>/dev/null || dirty="*"
-    printf " %s⎇ %s%s" "${DIM}" "${b}" "${dirty}"
-  }
+git_prompt() {
+  local b; b="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" || return
+  local dirty=""; git diff --quiet --ignore-submodules 2>/dev/null || dirty="*"
+
+  # non-printing markers for readline: \001 ... \002
+  local dim=$'\001\e[38;2;92;99;112m\002'
+  local reset=$'\001\e[0m\002'
+
+  printf " %s⎇ %s%s%s" "$dim" "$b" "$dirty" "$reset"
+}
   prompt_symbol() { [[ $EUID -eq 0 ]] && printf "#" || printf "$"; }
 
   # PS1 only for interactive shells
