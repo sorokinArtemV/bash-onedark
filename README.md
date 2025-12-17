@@ -38,34 +38,54 @@ terminals.
 
 ------------------------------------------------------------------------
 
-## 🚀 Installation
+🚀 Installation
 
-1.  Copy `onedark.sh` and `onedark` into `~/bin/`:
+This setup automatically enables the OneDark Bash prompt for every new Bash session.
 
-    ``` bash
-    mkdir -p ~/bin
-    cp onedark.sh ~/bin/
-    cp onedark ~/bin/
-    chmod +x ~/bin/onedark
-    ```
+1. Place the OneDark configuration script
 
-2.  Add this line to your `~/.bashrc`:
+Create a directory for the theme and copy the configuration file:
 
-    ``` bash
-    source ~/bin/onedark
-    ```
+mkdir -p ~/onedark
+cp onedark.sh ~/onedark/onedark.sh
 
-3.  Reload shell:
 
-    ``` bash
-    source ~/.bashrc
-    ```
+Note: onedark.sh is a Bash configuration script and must be sourced, not executed.
+Do not mark it as executable.
 
-4.  Or run manually anytime:
+2. Ensure .bashrc is loaded (Git Bash users only)
 
-    ``` bash
-    ~/bin/onedark
-    ```
+On Ubuntu, this step is not required.
+
+For Git Bash on Windows, ensure ~/.bash_profile loads .bashrc:
+
+if [ -f ~/.bashrc ]; then
+  source ~/.bashrc
+fi
+
+3. Enable automatic loading of the OneDark prompt
+
+Add the following to the end of your ~/.bashrc:
+
+# OneDark prompt
+if [ -f "$HOME/onedark/onedark.sh" ]; then
+  source "$HOME/onedark/onedark.sh"
+fi
+
+4. Reload the shell
+
+Apply the changes without restarting the terminal:
+
+source ~/.bashrc
+
+
+Or simply open a new terminal window.
+
+5. (Optional) Manual activation
+
+You can enable the theme manually in the current shell at any time:
+
+source ~/onedark/onedark.sh
 
 ------------------------------------------------------------------------
 
