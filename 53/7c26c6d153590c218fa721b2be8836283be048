@@ -1,0 +1,21 @@
+onedark.zsh
+  s_97c2ccf3bdfb4e::t_4d572899fb1935 1-83
+README.md
+  s_97c2ccf3bdfb4e::t_448b25b6bb99bb 1,3-4,6,8-11,13,15,17,19-27,29,32,37,39,41,44-45,48-49,51,53,56,62-65,67,70,75-81,83-89,92-93,96-99,101-104,106,108-111,113-117,119,121,123,125-129,131,133,135-144,146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "537c26c6d153590c218fa721b2be8836283be048",
+  "prompts": {},
+  "sessions": {
+    "s_97c2ccf3bdfb4e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24c4a091-8bd3-4881-bcb6-4d39825fb3bb",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "artem.sorokin <artem.sorokin@ventionteams.com>"
+    }
+  }
+}
