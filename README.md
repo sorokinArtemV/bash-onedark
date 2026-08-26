@@ -110,8 +110,12 @@ source ~/.zshrc   # or open a new terminal
 onedark           # turn the theme on
 ```
 
-> **Want full per-extension `ls` colors?** Install GNU coreutils — the theme
-> detects `gls` automatically:
+> **Recommended: install GNU coreutils.** With `gls` present the theme uses
+> **exact RGB colors**, so directories (and everything else) look identical in
+> every terminal — Ghostty, Terminal.app, iTerm2. Without it, macOS `ls` can
+> only use the 8 ANSI palette colors, which each terminal theme remaps
+> differently (that's why folder colors can look off in some terminals). The
+> theme detects `gls` automatically:
 > ```bash
 > brew install coreutils
 > ```
@@ -127,6 +131,7 @@ Available after the theme is loaded (both flavors):
 | `onedark` | Apply the theme — truecolor if supported, else 256-color |
 | `od-true` | Force the 24-bit truecolor profile                      |
 | `od-256`  | Force the 256-color fallback profile                    |
+| `od-off`  | Restore the default prompt and remove the `ls` alias (zsh) |
 
 ---
 

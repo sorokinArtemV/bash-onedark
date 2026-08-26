@@ -1,83 +1,122 @@
-# One Dark prompt + ls colors for zsh on macOS
-# Manual only: sourcing this file just DEFINES commands. Type `onedark` to apply.
-#   onedark   -> auto: truecolor if COLORTERM says so, else 256
-#   od-true   -> force 24-bit truecolor
-#   od-256    -> force 256-color fallback
+# ============================================================================
+#  One Dark — prompt + file/grep/less colors for zsh (macOS-friendly)
+# ============================================================================
+#  Manual by design: sourcing this file only DEFINES commands. Nothing is
+#  applied until you run one of:
 #
-# ls colors: uses GNU `gls` + LS_COLORS (rich, per-extension) if coreutils is
-# installed; otherwise falls back to BSD `ls -G` + LSCOLORS (8 base colors only).
+#     onedark   -> apply (truecolor if the terminal supports it, else 256)
+#     od-true   -> force 24-bit truecolor
+#     od-256    -> force 256-color fallback
+#     od-off    -> restore the default prompt & remove the ls alias
+#
+#  File colors use EXACT RGB (truecolor) so directories look identical in
+#  Ghostty, Terminal.app, iTerm2, etc. — independent of the terminal's theme.
+#  This requires GNU coreutils `gls` (brew install coreutils). If it is not
+#  found we fall back to BSD `ls -G` + LSCOLORS, whose colors are limited to
+#  the 8 ANSI palette entries and therefore vary between terminal themes.
+# ============================================================================
 
-# ----- shared: ls / grep / less coloring -----
-__od_set_lscolors() {
+# ----- One Dark palette (hex, no '#') --------------------------------------
+_OD_GREEN=98C379   # directories
+_OD_BLUE=61AFEF    # path, source code
+_OD_CYAN=56B6C2    # symlinks, media, ':' separator
+_OD_YELLOW=E5C07B  # prompt symbol, js/ts, images, sql
+_OD_ORANGE=D19A66  # archives, data/config
+_OD_RED=E06C75     # username, device/danger files
+_OD_PURPLE=C678DD  # executables
+_OD_GRAY=ABB2BF    # scripts, text
+_OD_DIM=5C6370     # git branch, dimmed
+
+# rgb 'RRGGBB' -> 'r;g;b'   (portable hex->dec, no $(( )) base tricks)
+_od_rgb() {
+  local h=$1
+  printf '%d;%d;%d' "0x${h[1,2]}" "0x${h[3,4]}" "0x${h[5,6]}"
+}
+
+# ----- ls / grep / less colors ---------------------------------------------
+_od_apply_filecolors() {
+  local g b c y o r p a d
+  g=$(_od_rgb $_OD_GREEN);  b=$(_od_rgb $_OD_BLUE);   c=$(_od_rgb $_OD_CYAN)
+  y=$(_od_rgb $_OD_YELLOW); o=$(_od_rgb $_OD_ORANGE); r=$(_od_rgb $_OD_RED)
+  p=$(_od_rgb $_OD_PURPLE); a=$(_od_rgb $_OD_GRAY);   d=$(_od_rgb $_OD_DIM)
+
   if command -v gls >/dev/null 2>&1; then
-    # GNU coreutils available -> full One Dark palette, per extension
-    export LS_COLORS="di=01;38;2;152;195;121:ln=01;38;2;86;182;194:ex=01;38;2;198;120;221:\
-so=38;2;180;180;140:pi=38;2;180;180;140:bd=01;38;2;224;108;117:cd=01;38;2;224;108;117:\
-su=01;38;2;224;108;117:sg=01;38;2;224;108;117:tw=01;38;2;224;108;117:ow=01;38;2;224;108;117:\
-*.tar=38;2;209;154;102:*.gz=38;2;209;154;102:*.bz2=38;2;209;154;102:*.xz=38;2;209;154;102:*.zip=38;2;209;154;102:*.7z=38;2;209;154;102:\
-*.jpg=38;2;229;192;123:*.jpeg=38;2;229;192;123:*.png=38;2;229;192;123:*.gif=38;2;229;192;123:*.webp=38;2;229;192;123:*.svg=38;2;229;192;123:\
-*.mp3=38;2;86;182;194:*.flac=38;2;86;182;194:*.wav=38;2;86;182;194:*.mp4=38;2;86;182;194:*.mkv=38;2;86;182;194:*.mov=38;2;86;182;194:\
-*.sh=38;2;171;178;191:*.bash=38;2;171;178;191:*.zsh=38;2;171;178;191:*.ps1=38;2;171;178;191:\
-*.py=38;2;97;175;239:*.rb=38;2;97;175;239:*.pl=38;2;97;175;239:*.java=38;2;97;175;239:*.kt=38;2;97;175;239:*.scala=38;2;97;175;239:*.c=38;2;97;175;239:*.h=38;2;97;175;239:*.cpp=38;2;97;175;239:*.hpp=38;2;97;175;239:*.cs=38;2;97;175;239:*.go=38;2;97;175;239:*.rs=38;2;97;175;239:\
-*.js=38;2;229;192;123:*.ts=38;2;229;192;123:*.tsx=38;2;229;192;123:*.jsx=38;2;229;192;123:\
-*.json=38;2;209;154;102:*.yml=38;2;209;154;102:*.yaml=38;2;209;154;102:*.toml=38;2;209;154;102:*.xml=38;2;209;154;102:\
-*.md=38;2;171;178;191:*.txt=38;2;171;178;191:*.log=38;2;171;178;191:\
-*.sql=38;2;229;192;123:*.db=38;2;229;192;123:*.sqlite=38;2;229;192;123"
-    alias ls='gls --color=auto'
+    # Exact truecolor, per file type / extension.
+    export LS_COLORS="\
+di=01;38;2;${g}:ln=01;38;2;${c}:ex=01;38;2;${p}:\
+so=38;2;${c}:pi=38;2;${c}:bd=01;38;2;${r}:cd=01;38;2;${r}:\
+su=01;38;2;${r}:sg=01;38;2;${r}:tw=01;38;2;${g}:ow=01;38;2;${g}:\
+*.tar=38;2;${o}:*.tgz=38;2;${o}:*.gz=38;2;${o}:*.bz2=38;2;${o}:*.xz=38;2;${o}:*.zst=38;2;${o}:*.zip=38;2;${o}:*.7z=38;2;${o}:*.rar=38;2;${o}:\
+*.jpg=38;2;${y}:*.jpeg=38;2;${y}:*.png=38;2;${y}:*.gif=38;2;${y}:*.webp=38;2;${y}:*.svg=38;2;${y}:*.heic=38;2;${y}:\
+*.mp3=38;2;${c}:*.flac=38;2;${c}:*.wav=38;2;${c}:*.mp4=38;2;${c}:*.mkv=38;2;${c}:*.mov=38;2;${c}:*.webm=38;2;${c}:\
+*.sh=38;2;${a}:*.bash=38;2;${a}:*.zsh=38;2;${a}:*.fish=38;2;${a}:*.ps1=38;2;${a}:\
+*.py=38;2;${b}:*.rb=38;2;${b}:*.pl=38;2;${b}:*.java=38;2;${b}:*.kt=38;2;${b}:*.scala=38;2;${b}:*.c=38;2;${b}:*.h=38;2;${b}:*.cpp=38;2;${b}:*.hpp=38;2;${b}:*.cc=38;2;${b}:*.cs=38;2;${b}:*.go=38;2;${b}:*.rs=38;2;${b}:*.swift=38;2;${b}:\
+*.js=38;2;${y}:*.mjs=38;2;${y}:*.cjs=38;2;${y}:*.ts=38;2;${y}:*.tsx=38;2;${y}:*.jsx=38;2;${y}:\
+*.json=38;2;${o}:*.yml=38;2;${o}:*.yaml=38;2;${o}:*.toml=38;2;${o}:*.xml=38;2;${o}:*.ini=38;2;${o}:*.env=38;2;${o}:\
+*.md=38;2;${a}:*.txt=38;2;${a}:*.log=38;2;${a}:*.rst=38;2;${a}:\
+*.sql=38;2;${y}:*.db=38;2;${y}:*.sqlite=38;2;${y}"
+    alias ls='gls --color=auto --group-directories-first'
   else
-    # BSD ls -> LSCOLORS: 11 fg/bg pairs, only 8 base colors, no per-extension.
-    # order: dir sym socket pipe exec block char setuid setgid dir+sticky dir+nosticky
-    # C=bold green (dir) G=bold cyan (link) F=bold magenta (exec) d=brown B=bold red
-    export LSCOLORS="CxGxdxdxFxBxBxBxBxBxBx"
+    # BSD ls: only 8 base colors, remapped by the terminal theme.
     export CLICOLOR=1
+    export LSCOLORS="CxGxdxdxFxBxBxBxBxBxBx"
     alias ls='ls -G'
   fi
 
-  # grep (BSD grep on macOS honors GREP_COLORS)
-  export GREP_COLORS='ms=01;38;2;224;108;117:mc=01;38;2;224;108;117:sl=:cx=:fn=38;2;171;178;191:ln=38;2;92;99;112:bn=38;2;92;99;112:se=38;2;171;178;191'
+  # grep matches (BSD grep on macOS honors GREP_COLORS)
+  export GREP_COLORS="ms=01;38;2;${r}:mc=01;38;2;${r}:sl=:cx=:fn=38;2;${a}:ln=38;2;${d}:bn=38;2;${d}:se=38;2;${a}"
 
-  # less (RGB caps)
+  # less (man pages, etc.)
   export LESS='-R'
-  export LESS_TERMCAP_mb=$'\e[01;38;2;224;108;117m'
-  export LESS_TERMCAP_md=$'\e[01;38;2;198;120;221m'
+  export LESS_TERMCAP_mb=$'\e[01;38;2;'"${r}"'m'
+  export LESS_TERMCAP_md=$'\e[01;38;2;'"${p}"'m'
   export LESS_TERMCAP_me=$'\e[0m'
   export LESS_TERMCAP_se=$'\e[0m'
-  export LESS_TERMCAP_so=$'\e[48;2;92;99;112;38;2;171;178;191m'
+  export LESS_TERMCAP_so=$'\e[48;2;'"${d}"';38;2;'"${a}"'m'
   export LESS_TERMCAP_ue=$'\e[0m'
-  export LESS_TERMCAP_us=$'\e[01;38;2;97;175;239m'
+  export LESS_TERMCAP_us=$'\e[01;38;2;'"${b}"'m'
 }
 
-# ----- git adornment (used by both prompt variants) -----
-__od_git_prompt() {
-  local b; b="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" || return
-  local dirty=""; git diff --quiet --ignore-submodules 2>/dev/null || dirty="*"
-  print -n " %F{#5C6370}⎇ ${b}${dirty}%f"
+# ----- git branch adornment (rendered via prompt_subst) --------------------
+_od_git() {
+  command git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return
+  local ref
+  ref=$(command git symbolic-ref --quiet --short HEAD 2>/dev/null) \
+    || ref=$(command git rev-parse --short HEAD 2>/dev/null) \
+    || return
+  local dirty=''
+  command git diff --quiet --ignore-submodules HEAD 2>/dev/null || dirty='*'
+  print -rn -- " %F{#${_OD_DIM}}⎇ ${ref}${dirty}%f"
 }
 
-# ----- TRUECOLOR (24-bit) -----
-__od_set_truecolor() {
-  __od_set_lscolors
+# ----- prompts --------------------------------------------------------------
+_od_prompt_true() {
   setopt prompt_subst
-  # user:cwd git-branch  $      (RED user, CYAN colon, BLUE cwd, YELLOW symbol)
-  PROMPT='%F{#E06C75}%n%F{#56B6C2}:%F{#61AFEF}%3~%F{#56B6C2}$(__od_git_prompt) %F{#E5C07B}%(!.#.$)%f '
+  PROMPT='%F{#'"${_OD_RED}"'}%n%F{#'"${_OD_CYAN}"'}:%F{#'"${_OD_BLUE}"'}%3~%F{#'"${_OD_CYAN}"'}$(_od_git) %F{#'"${_OD_YELLOW}"'}%(!.#.$)%f '
 }
 
-# ----- 256-COLOR fallback -----
-__od_set_256() {
-  __od_set_lscolors
+_od_prompt_256() {
   setopt prompt_subst
-  PROMPT='%F{114}%n %F{39}%3~%F{44}$(__od_git_prompt) %F{179}%(!.#.$)%f '
+  PROMPT='%F{114}%n%F{44}:%F{39}%3~%F{44}$(_od_git) %F{179}%(!.#.$)%f '
 }
 
-# ----- Manual commands -----
+# ----- public commands ------------------------------------------------------
+od-true() { _od_apply_filecolors; _od_prompt_true; }
+od-256()  { _od_apply_filecolors; _od_prompt_256; }
+
 onedark() {
-  if [[ "$COLORTERM" == *truecolor* || "$COLORTERM" == *24bit* ]]; then
-    __od_set_truecolor
+  if [[ "$COLORTERM" == *(truecolor|24bit)* ]]; then
+    od-true
   else
-    __od_set_256
+    od-256
   fi
 }
-od-true() { __od_set_truecolor; }
-od-256()  { __od_set_256; }
 
-# NOTE: intentionally NOT applied on load. Run `onedark` to enable.
+od-off() {
+  unalias ls 2>/dev/null
+  unset LS_COLORS LSCOLORS
+  PROMPT='%n@%m %1~ %# '
+  print -r -- "One Dark disabled for this shell."
+}
+
+# NOTE: intentionally not applied on load. Run `onedark` to enable.
