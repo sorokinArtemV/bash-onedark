@@ -1,142 +1,148 @@
-# One Dark Bash Prompt & LS_COLORS
+# 🎨 One Dark — Shell Prompt & File Colors
 
-This script configures your Bash prompt and `LS_COLORS` theme to use the
-**One Dark** color scheme.\
-It supports both **truecolor (24-bit)** and **256-color fallback**
-terminals.
+A **One Dark** color scheme for your shell: a clean prompt with a git branch
+indicator, plus consistent coloring for `ls`, `grep`, and `less`.
 
-------------------------------------------------------------------------
+Two flavors are included:
 
-## 📂 Files
+| Shell / OS            | File          | Notes                                            |
+|-----------------------|---------------|--------------------------------------------------|
+| **Bash** (Linux)      | `onedark.sh`  | Original version. Auto-applies on shell startup. |
+| **zsh** (macOS)       | `onedark.zsh` | For macOS default shell. Applied by command.     |
 
--   **`~/bin/onedark.sh`**\
-    Main script with color definitions and prompt setup.\
-    It is meant to be *sourced* into your current shell, not executed
-    directly.
+Both support **truecolor (24-bit)** with an automatic **256-color** fallback.
 
--   **`~/bin/onedark`**\
-    Small launcher script that sources `onedark.sh`:
+---
 
-    ``` bash
-    #!/bin/bash
-    . "${HOME}/bin/onedark.sh"
-    ```
+## ✨ Features
 
-------------------------------------------------------------------------
+- One Dark colors for the prompt: `user : path ⎇ branch $`
+- Git branch name with a `*` marker when the working tree is dirty
+- Auto-detects **truecolor** vs **256-color** terminals
+- Colored `ls`, with distinct colors for:
+  - Directories, symlinks, executables
+  - Archives, images, audio/video, scripts
+  - Source code (C, Go, Rust, Java, Python, …)
+  - Config/data files (JSON, YAML, XML, SQL, …)
+- Colored `grep` matches and `less` output
 
-## 🎨 Features
+Check your terminal supports truecolor first:
 
--   One Dark colors for:
-    -   Directories, symlinks, executables
-    -   Archives, images, audio/video, scripts
-    -   Source code files (C, Java, Python, etc.)
-    -   Config/data formats (JSON, YAML, XML, SQL, DB, etc.)
--   Git branch and dirty marker in prompt
--   Auto-detects **truecolor** vs **256-color** terminal
--   Aliases `ls` to always use colors
--   Proper colors in `grep` and `less`
+```bash
+echo $COLORTERM   # should contain "truecolor" or "24bit"
+```
 
-------------------------------------------------------------------------
+---
 
-## 🚀 Installation
+## 🐧 Bash (Linux)
 
-This setup automatically enables the OneDark Bash prompt for every new Bash session.
+The Bash version is **sourced** into your shell and applies automatically.
 
-### 1. Place the OneDark configuration script
-
-Create a directory for the theme and copy the configuration file:
+### 1. Install
 
 ```bash
 mkdir -p ~/onedark
 cp onedark.sh ~/onedark/onedark.sh
 ```
 
-> **Note**  
-> `onedark.sh` is a Bash configuration script and must be **sourced**, not executed.  
-> Do **not** mark it as executable (`chmod +x` is not required).
+> `onedark.sh` is meant to be **sourced**, not executed.
+> Don't add a shebang and don't `chmod +x` it.
 
----
+### 2. Enable on startup
 
-### 2. Ensure `.bashrc` is loaded (Git Bash users only)
-
-On Ubuntu, this step is not required.
-
-For Git Bash on Windows, ensure `~/.bash_profile` loads `.bashrc`:
+Add to the **end** of your `~/.bashrc`:
 
 ```bash
-if [ -f ~/.bashrc ]; then
-  source ~/.bashrc
-fi
-```
-
----
-
-### 3. Enable automatic loading of the OneDark prompt
-
-Add the following to the **end** of your `~/.bashrc`:
-
-```bash
-# OneDark prompt
+# One Dark prompt
 if [ -f "$HOME/onedark/onedark.sh" ]; then
   source "$HOME/onedark/onedark.sh"
 fi
 ```
 
----
+> **Git Bash on Windows only:** make sure `~/.bash_profile` loads `.bashrc`:
+> ```bash
+> [ -f ~/.bashrc ] && source ~/.bashrc
+> ```
 
-### 4. Reload the shell
-
-Apply the changes without restarting the terminal:
-
-```bash
-source ~/.bashrc
-```
-
-Or simply open a new terminal window.
-
----
-
-### 5. (Optional) Manual activation
-
-You can enable the theme manually in the current shell at any time:
+### 3. Reload
 
 ```bash
-source ~/onedark/onedark.sh
+source ~/.bashrc   # or open a new terminal
 ```
 
 ---
 
-## ℹ️ Notes
+## 🍎 macOS (zsh)
 
-- Do not run `onedark.sh` as a program (`./onedark.sh`)
-- Do not add execute permissions (`chmod +x`)
-- Prompt configuration must be sourced to affect the current shell
+On macOS the default login shell is **zsh** (used by Terminal.app, iTerm2,
+Ghostty, …), and the system `ls` is **BSD ls** — it doesn't understand Bash
+prompt escapes, `--color=auto`, or `LS_COLORS`. Use **`onedark.zsh`** here.
 
-------------------------------------------------------------------------
+What's different from the Bash version:
 
-## ⚡ Manual overrides
+- Prompt rewritten with zsh escapes (`%n`, `%3~`, `%F{#hex}`) — same look.
+- `ls` coloring auto-detects **GNU coreutils**: if `gls` is installed it uses
+  the full per-extension `LS_COLORS` palette; otherwise it falls back to BSD
+  `ls -G` + `LSCOLORS` (8 base colors, no per-extension coloring).
+- Applied **by command**, not automatically.
 
--   Force truecolor profile:
+### 1. Install
 
-    ``` bash
-    od-true
-    ```
+```bash
+mkdir -p ~/.config/onedark
+cp onedark.zsh ~/.config/onedark/onedark.zsh
+```
 
--   Force 256-color profile:
+### 2. Register the commands
 
-    ``` bash
-    od-256
-    ```
+Add to the **end** of your `~/.zshrc`. This only *defines* the commands — it
+does **not** apply the theme on startup:
 
-------------------------------------------------------------------------
+```bash
+# One Dark theme (manual): defines `onedark` / `od-true` / `od-256`.
+[ -f "$HOME/.config/onedark/onedark.zsh" ] && source "$HOME/.config/onedark/onedark.zsh"
+```
 
-## ✅ Notes
+### 3. Enable
 
--   **Do not add shebang** (`#!/usr/bin/env bash`) to `onedark.sh`,
-    since it is sourced.
--   Make sure your terminal supports truecolor (`echo $COLORTERM` should
-    contain `truecolor` or `24bit`).
+```bash
+source ~/.zshrc   # or open a new terminal
+onedark           # turn the theme on
+```
 
-------------------------------------------------------------------------
+> **Want full per-extension `ls` colors?** Install GNU coreutils — the theme
+> detects `gls` automatically:
+> ```bash
+> brew install coreutils
+> ```
+
+---
+
+## ⚡ Commands
+
+Available after the theme is loaded (both flavors):
+
+| Command   | Effect                                                  |
+|-----------|---------------------------------------------------------|
+| `onedark` | Apply the theme — truecolor if supported, else 256-color |
+| `od-true` | Force the 24-bit truecolor profile                      |
+| `od-256`  | Force the 256-color fallback profile                    |
+
+---
+
+## 🎨 Palette
+
+| Role                | Hex        |
+|---------------------|------------|
+| Green (dirs)        | `#98C379`  |
+| Blue (path/code)    | `#61AFEF`  |
+| Cyan (links/media)  | `#56B6C2`  |
+| Yellow (js/ts/data) | `#E5C07B`  |
+| Orange (archives)   | `#D19A66`  |
+| Red (user/errors)   | `#E06C75`  |
+| Purple (exec)       | `#C678DD`  |
+| Gray (text/dim)     | `#5C6370`  |
+
+---
 
 Enjoy your One Dark themed terminal ✨
