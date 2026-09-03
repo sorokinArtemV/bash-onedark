@@ -17,6 +17,12 @@ if ! grep -qF "$MARKER_START" "$BASHRC" 2>/dev/null; then
   {
     echo ""
     echo "$MARKER_START"
+    echo "# sshd on most minimal images only forwards LANG/LC_* (see AcceptEnv"
+    echo "# in /etc/ssh/sshd_config), so COLORTERM never reaches SSH sessions"
+    echo "# (e.g. 'multipass shell') even when the local terminal supports it."
+    echo "if [ -z \"\$COLORTERM\" ]; then"
+    echo "  export COLORTERM=truecolor"
+    echo "fi"
     echo "if [ -f \"$THEME_FILE\" ]; then"
     echo "  source \"$THEME_FILE\""
     echo "fi"

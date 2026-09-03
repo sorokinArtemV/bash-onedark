@@ -50,6 +50,13 @@ source ~/.bashrc
 
 Handy for fresh boxes / disposable VMs (e.g. `multipass exec <vm> -- bash -c "curl -fsSL https://raw.githubusercontent.com/sorokinArtemV/bash-onedark/main/install.sh | bash"`).
 
+> **Colors look washed out over SSH (e.g. `multipass shell`)?** Most `sshd`
+> configs only forward `LANG`/`LC_*` env vars (see `AcceptEnv` in
+> `/etc/ssh/sshd_config`), so `$COLORTERM` never reaches the remote shell even
+> if your local terminal supports truecolor — the theme then falls back to
+> 256-color. The installer above already works around this by exporting
+> `COLORTERM=truecolor` in `~/.bashrc` when it isn't already set.
+
 Or do it manually:
 
 ### 1. Install
