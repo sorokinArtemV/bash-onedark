@@ -38,6 +38,20 @@ echo $COLORTERM   # should contain "truecolor" or "24bit"
 
 The Bash version is **sourced** into your shell and applies automatically.
 
+### Quick install (one-liner)
+
+Installs `onedark.sh` into `~/onedark/` and wires it into `~/.bashrc` for you.
+Safe to re-run — it won't duplicate the `.bashrc` entry.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sorokinArtemV/bash-onedark/main/install.sh | bash
+source ~/.bashrc
+```
+
+Handy for fresh boxes / disposable VMs (e.g. `multipass exec <vm> -- bash -c "curl -fsSL https://raw.githubusercontent.com/sorokinArtemV/bash-onedark/main/install.sh | bash"`).
+
+Or do it manually:
+
 ### 1. Install
 
 ```bash
